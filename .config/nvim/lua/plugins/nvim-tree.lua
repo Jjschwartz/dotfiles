@@ -1,8 +1,5 @@
 return {
     "nvim-tree/nvim-tree.lua",
-    dependencies = {
-        "nvim-tree/nvim-web-devicons",  -- Optional: for file icons
-    },
     config = function ()
         -- Disable netrw (Neovim's built-in file explorer)
         vim.g.loaded_netrw = 1
@@ -22,15 +19,23 @@ return {
 
             renderer = {
                 group_empty = true,
-                icons = {
+                icons = {  -- disable icons
                     show = {
-                        file = true,
-                        folder = true,
-                        folder_arrow = true,
-                        git = true,
+                        file = false,
+                        folder = false,
+                        -- keep dir arrow for collapsing/expanding
+                        folder_arrow = true,   
+                        git = false,
+                    },
+                    glyphs = {
+                        folder = {
+                            arrow_closed = "▸",
+                            arrow_open = "▾",
+                        },
                     },
                 },
             },
+            
             filters = {
                 dotfiles = false,  -- Show hidden files
                 custom = { "^.git$" },  -- Hide .git folder
@@ -44,6 +49,5 @@ return {
         -- Keybindings
         vim.keymap.set('n', '<leader>e', '<cmd>NvimTreeToggle<cr>', { desc = 'Toggle file explorer' })
         vim.keymap.set('n', '<leader>o', '<cmd>NvimTreeFocus<cr>', { desc = 'Focus file explorer' })
-        vim.keymap.set('n', '<leader>ff', '<cmd>NvimTreeFindFile<cr>', { desc = 'Find current file in explorer' })
     end
 }
