@@ -38,11 +38,22 @@ fi
 # See: https://direnv.net/docs/hook.html
 eval "$(direnv hook bash)"
 
+# ---- GCLOUD ---
 # Google cloud sdk (if available)
 if [ -f $HOME/google-cloud-sdk/bin ]; then
     export PATH=$PATH:$HOME/google-cloud-sdk/bin
 fi
 
+# gcloud completions
+# linux: look in snap dirs
+if [ -f /snap/google-cloud-cli/current/completion.bash.inc ]; then
+    source /snap/google-cloud-cli/current/completion.bash.inc
+fi
+
+if [ -f /snap/google-cloud-sdk/current/path.bash.inc ]; then
+    source /snap/google-cloud-sdk/current/path.bash.inc
+fi
+# ---- GCLOUD ---
 
 # Colorize prompt (simple version)
 # For basic colored prompt:

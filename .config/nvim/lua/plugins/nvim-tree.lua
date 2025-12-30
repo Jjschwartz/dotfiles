@@ -17,6 +17,12 @@ return {
                 relativenumber = true,
             },
 
+            update_focused_file = {
+                enable = true,
+                update_root = false,
+                ignore_list = {},
+            },
+
             renderer = {
                 group_empty = true,
                 icons = {  -- disable icons

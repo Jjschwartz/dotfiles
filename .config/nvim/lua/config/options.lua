@@ -25,3 +25,4 @@ opt.termguicolors = true   -- True color support
 opt.signcolumn = "yes"     -- Keep space for linting icons (stops shifting)
 opt.splitbelow = true      -- New horizontal splits go down
 opt.splitright = true      -- New vertical splits go right
+
