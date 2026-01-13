@@ -229,8 +229,12 @@ install_cli_tools() {
             log_info "neovim is already installed"
         else
             log_info "Installing neovim..."
-            # Use the appimage for latest version on Linux
-            curl -fsSL https://github.com/neovim/neovim/releases/latest/download/nvim.appimage -o /tmp/nvim.appimage
+            local arch
+            arch=$(uname -m)
+            if [[ "$arch" == "aarch64" ]]; then
+                arch="arm64"
+            fi
+            curl -fsSL "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${arch}.appimage" -o /tmp/nvim.appimage
             chmod u+x /tmp/nvim.appimage
             run_privileged mv /tmp/nvim.appimage /usr/local/bin/nvim
         fi
