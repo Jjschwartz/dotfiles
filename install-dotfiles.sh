@@ -10,10 +10,10 @@
 #   git-delta, tmux, neovim, lazygit, mactop (macOS), Claude Code, dotfiles
 #
 # ============================================================================
-# SETUP INSTRUCTIONS FOR A NEW MACHINE
+# SETUP INSTRUCTIONS
 # ============================================================================
 #
-# --- macOS ---
+# --- macOS (editable, with SSH) ---
 #
 #   # 1. Set up SSH key (copy existing or generate new)
 #   ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_jjschwartz
@@ -32,16 +32,21 @@
 #   # 4. Run install script
 #   curl -fsSL https://raw.githubusercontent.com/jjschwartz/dotfiles/main/install-dotfiles.sh | bash
 #
-# --- Linux ---
+# --- Linux (editable, with SSH) ---
 #
-#   # 1. Set up SSH key (copy existing or generate new)
-#   ssh-keygen -t ed25519
+#   # 1. Set up SSH key and add to GitHub (as above)
 #
-#   # 2. Add key to GitHub: https://github.com/settings/keys
-#   cat ~/.ssh/id_ed25519.pub
-#
-#   # 3. Run install script (requires root or sudo)
+#   # 2. Run install script (requires root or sudo)
 #   curl -fsSL https://raw.githubusercontent.com/jjschwartz/dotfiles/main/install-dotfiles.sh | bash
+#
+# --- Ephemeral server (read-only, no SSH required) ---
+#
+#   DOTFILES_MODE=https curl -fsSL https://raw.githubusercontent.com/jjschwartz/dotfiles/main/install-dotfiles.sh | bash
+#
+# ============================================================================
+#
+# ENVIRONMENT VARIABLES:
+#   DOTFILES_MODE  - "ssh" (default, editable) or "https" (read-only)
 #
 # ============================================================================
 
@@ -300,16 +305,26 @@ setup_dotfiles() {
         return 0
     fi
 
-    # Determine SSH host based on OS
-    local git_host
-    if [[ "$OS" == "macos" ]]; then
-        git_host="github.com-jjschwartz"
+    # Determine clone URL based on DOTFILES_MODE
+    local clone_url
+    local mode="${DOTFILES_MODE:-ssh}"
+
+    if [[ "$mode" == "https" ]]; then
+        clone_url="https://github.com/jjschwartz/dotfiles.git"
+        log_info "Cloning dotfiles via HTTPS (read-only)..."
     else
-        git_host="github.com"
+        # SSH mode - determine host based on OS
+        local git_host
+        if [[ "$OS" == "macos" ]]; then
+            git_host="github.com-jjschwartz"
+        else
+            git_host="github.com"
+        fi
+        clone_url="git@${git_host}:jjschwartz/dotfiles.git"
+        log_info "Cloning dotfiles via SSH (editable)..."
     fi
 
-    log_info "Cloning dotfiles from git@${git_host}:jjschwartz/dotfiles.git..."
-    git clone --bare "git@${git_host}:jjschwartz/dotfiles.git" "$dotfiles_dir"
+    git clone --bare "$clone_url" "$dotfiles_dir"
 
     # Checkout dotfiles, backing up any conflicts
     log_info "Checking out dotfiles..."
@@ -329,7 +344,10 @@ setup_dotfiles() {
     # Hide untracked files
     /usr/bin/git --git-dir="$dotfiles_dir" --work-tree="$HOME" config --local status.showUntrackedFiles no
 
-    log_info "Dotfiles setup complete"
+    log_info "Dotfiles setup complete ($mode mode)"
+    if [[ "$mode" == "https" ]]; then
+        log_warn "Read-only mode: use 'dotf pull' to update, but cannot push changes"
+    fi
     log_info "Add the following alias to your shell config:"
     log_info "  $dotfiles_alias"
 }
