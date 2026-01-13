@@ -41,7 +41,7 @@
 #
 # --- Ephemeral server (read-only, no SSH required) ---
 #
-#   DOTFILES_MODE=https curl -fsSL https://raw.githubusercontent.com/jjschwartz/dotfiles/main/install-dotfiles.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/jjschwartz/dotfiles/main/install-dotfiles.sh | DOTFILES_MODE=https bash
 #
 # ============================================================================
 #
