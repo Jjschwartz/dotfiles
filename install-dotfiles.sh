@@ -40,7 +40,7 @@
 #   # 2. Add key to GitHub: https://github.com/settings/keys
 #   cat ~/.ssh/id_ed25519.pub
 #
-#   # 3. Run install script (requires sudo)
+#   # 3. Run install script (requires root or sudo)
 #   curl -fsSL https://raw.githubusercontent.com/jjschwartz/dotfiles/main/install-dotfiles.sh | bash
 #
 # ============================================================================
@@ -73,6 +73,18 @@ log_section() {
 
 command_exists() {
     command -v "$1" &> /dev/null
+}
+
+# Run command with sudo if needed (handles running as root or without sudo)
+run_privileged() {
+    if [[ $EUID -eq 0 ]]; then
+        "$@"
+    elif command_exists sudo; then
+        sudo "$@"
+    else
+        log_error "Need root privileges but sudo is not available"
+        exit 1
+    fi
 }
 
 # Detect OS
@@ -133,7 +145,7 @@ install_package() {
             log_info "$package is already installed"
         else
             log_info "Installing $package..."
-            sudo apt-get install -y "$package"
+            run_privileged apt-get install -y "$package"
         fi
     fi
 }
@@ -144,7 +156,7 @@ install_cli_tools() {
 
     if [[ "$OS" == "linux" ]]; then
         log_info "Updating apt package list..."
-        sudo apt-get update
+        run_privileged apt-get update
     fi
 
     # bash (macOS only - Linux already has bash)
@@ -179,7 +191,7 @@ install_cli_tools() {
         # On Debian/Ubuntu, bat is installed as 'batcat'
         if command_exists batcat && ! command_exists bat; then
             log_info "Creating bat symlink for batcat..."
-            sudo ln -sf "$(which batcat)" /usr/local/bin/bat 2>/dev/null || true
+            run_privileged ln -sf "$(which batcat)" /usr/local/bin/bat 2>/dev/null || true
         fi
     fi
 
@@ -201,7 +213,7 @@ install_cli_tools() {
             local delta_version
             delta_version=$(curl -s https://api.github.com/repos/dandavison/delta/releases/latest | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
             curl -fsSL "https://github.com/dandavison/delta/releases/download/${delta_version}/git-delta_${delta_version}_amd64.deb" -o /tmp/delta.deb
-            sudo dpkg -i /tmp/delta.deb
+            run_privileged dpkg -i /tmp/delta.deb
             rm /tmp/delta.deb
         fi
     fi
@@ -220,7 +232,7 @@ install_cli_tools() {
             # Use the appimage for latest version on Linux
             curl -fsSL https://github.com/neovim/neovim/releases/latest/download/nvim.appimage -o /tmp/nvim.appimage
             chmod u+x /tmp/nvim.appimage
-            sudo mv /tmp/nvim.appimage /usr/local/bin/nvim
+            run_privileged mv /tmp/nvim.appimage /usr/local/bin/nvim
         fi
     fi
 
@@ -236,7 +248,7 @@ install_cli_tools() {
             lazygit_version=$(curl -s https://api.github.com/repos/jesseduffield/lazygit/releases/latest | grep '"tag_name"' | sed -E 's/.*"v([^"]+)".*/\1/')
             curl -fsSL "https://github.com/jesseduffield/lazygit/releases/download/v${lazygit_version}/lazygit_${lazygit_version}_Linux_x86_64.tar.gz" -o /tmp/lazygit.tar.gz
             tar -xzf /tmp/lazygit.tar.gz -C /tmp lazygit
-            sudo mv /tmp/lazygit /usr/local/bin/
+            run_privileged mv /tmp/lazygit /usr/local/bin/
             rm /tmp/lazygit.tar.gz
         fi
     fi
