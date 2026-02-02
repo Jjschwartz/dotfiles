@@ -1,6 +1,6 @@
 # Bash command aliases
 # Force color output and group directories first
-alias ls='ls --color=auto --group-directories-first'
+alias ls='ls --color=auto'
 # List in long format with readable file sizes (KB, MB, GB)
 alias ll='ls -lh'
 # List all files, including hidden ones (dotfiles)
