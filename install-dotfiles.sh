@@ -335,11 +335,7 @@ setup_dotfiles() {
     else
         # SSH mode - determine host based on OS
         local git_host
-        if [[ "$OS" == "macos" ]]; then
-            git_host="github.com-jjschwartz"
-        else
-            git_host="github.com"
-        fi
+        git_host="github.com-jjschwartz"
         clone_url="git@${git_host}:jjschwartz/dotfiles.git"
         log_info "Cloning dotfiles via SSH (editable)..."
     fi
@@ -356,7 +352,10 @@ setup_dotfiles() {
         /usr/bin/git --git-dir="$dotfiles_dir" --work-tree="$HOME" checkout 2>&1 \
             | grep -E "^\s+" \
             | awk '{print $1}' \
-            | xargs -I{} mv "$HOME/{}" "$HOME/.dotfiles-backup/{}"
+            | while IFS= read -r file; do
+                mkdir -p "$HOME/.dotfiles-backup/$(dirname "$file")"
+                mv "$HOME/$file" "$HOME/.dotfiles-backup/$file"
+            done
         /usr/bin/git --git-dir="$dotfiles_dir" --work-tree="$HOME" checkout
         log_info "Dotfiles checked out successfully (conflicts backed up)"
     fi
