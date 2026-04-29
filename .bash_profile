@@ -5,3 +5,5 @@ fi
 
 # Disable annoying apple using .zshrc warning
 export BASH_SILENCE_DEPRECATION_WARNING=1
+
+. "$HOME/.local/bin/env"

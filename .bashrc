@@ -88,7 +88,11 @@ load-nvmrc
 # ---- FZF -----
 # Set up fzf key bindings and fuzzy completion
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-eval "$(fzf --bash)"
+if fzf --bash &>/dev/null 2>&1; then
+    eval "$(fzf --bash)"
+elif [ -f /usr/share/doc/fzf/examples/key-bindings.bash ]; then
+    source /usr/share/doc/fzf/examples/key-bindings.bash
+fi
 # ---- END FZF -----
 
 # ---- Starship ----
@@ -121,14 +125,16 @@ export PANTS_PROCESS_LOCAL_EXECUTION_ROOT_DIR=$HOME/.cache/pants/tmp
 
 # ---- PATH ----
 export PATH="$HOME/.local/bin:$PATH"
-. "$HOME/.local/bin/env"
+[ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
 # ---- END PATH ----
 
 # ---- UV ----
 # NOTE: needs to be placed after PATH update so uv can be found
 # Bash completion for uv
-eval "$(uv generate-shell-completion bash)"
-eval "$(uvx --generate-shell-completion bash)"
+if command -v uv &>/dev/null; then
+    eval "$(uv generate-shell-completion bash)"
+    eval "$(uvx --generate-shell-completion bash)"
+fi
 
 # Helper functions
 function uvrun() {
