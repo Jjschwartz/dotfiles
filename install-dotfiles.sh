@@ -7,7 +7,8 @@
 #
 # INSTALLS:
 #   Homebrew (macOS), bash, bash-completion, starship, bat, fzf, direnv,
-#   git-delta, tmux, neovim, lazygit, mactop (macOS), Claude Code, dotfiles
+#   git-delta, tmux, TPM (tmux plugin manager), neovim, lazygit,
+#   mactop (macOS), Claude Code, dotfiles
 #
 # ============================================================================
 # SETUP INSTRUCTIONS
@@ -226,6 +227,14 @@ install_cli_tools() {
     # tmux
     install_package "tmux"
 
+    # tmux plugin manager (TPM)
+    if [[ -d "$HOME/.tmux/plugins/tpm" ]]; then
+        log_info "TPM is already installed"
+    else
+        log_info "Installing TPM (Tmux Plugin Manager)..."
+        git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+    fi
+
     # neovim
     if [[ "$OS" == "macos" ]]; then
         install_package "neovim"
@@ -376,13 +385,15 @@ main() {
     log_info "  - fzf (fuzzy finder)"
     log_info "  - direnv"
     log_info "  - delta (better diffs)"
-    log_info "  - tmux"
+    log_info "  - tmux + TPM (plugin manager)"
     log_info "  - neovim"
     log_info "  - lazygit"
     [[ "$OS" == "macos" ]] && log_info "  - mactop (Apple Silicon monitor)"
     log_info "  - Claude Code"
     log_info "  - Dotfiles (bare repo)"
     echo ""
+    log_info "To install tmux plugins, open tmux and press: Prefix + I"
+    log_info ""
     log_info "You may need to restart your shell or run:"
     log_info "  source ~/.bashrc"
     echo ""
