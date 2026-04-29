@@ -7,8 +7,9 @@
 #
 # INSTALLS:
 #   Homebrew (macOS), bash, bash-completion, starship, bat, fzf, direnv,
-#   git-delta, tmux, TPM (tmux plugin manager), neovim, lazygit,
-#   mactop (macOS), Claude Code, dotfiles
+#   git-delta, tmux, TPM (tmux plugin manager), neovim (AppImage on Linux),
+#   python3-pip + python3-venv (Linux, required by Mason for Python LSP tools),
+#   lazygit, mactop (macOS), Claude Code, dotfiles
 #
 # ============================================================================
 # SETUP INSTRUCTIONS
@@ -239,8 +240,18 @@ install_cli_tools() {
     if [[ "$OS" == "macos" ]]; then
         install_package "neovim"
     else
-        if command_exists nvim; then
-            log_info "neovim is already installed"
+        # Python tooling required by Mason to install ruff/basedpyright
+        log_info "Installing Python tooling for Mason..."
+        run_privileged apt-get install -y python3-pip
+        local py_ver
+        py_ver=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+        run_privileged apt-get install -y "python${py_ver}-venv" || \
+            run_privileged apt-get install -y python3-venv
+
+        # Check for AppImage specifically — an apt-installed nvim at /usr/bin/nvim
+        # is likely too old (< 0.11) and would be shadowed by /usr/local/bin/nvim anyway.
+        if [[ -f "/usr/local/bin/nvim" ]]; then
+            log_info "neovim AppImage is already installed"
         else
             log_info "Installing neovim..."
             local arch
@@ -249,7 +260,7 @@ install_cli_tools() {
                 arch="arm64"
             fi
             curl -fsSL "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${arch}.appimage" -o /tmp/nvim.appimage
-            chmod u+x /tmp/nvim.appimage
+            chmod +x /tmp/nvim.appimage
             run_privileged mv /tmp/nvim.appimage /usr/local/bin/nvim
         fi
     fi
