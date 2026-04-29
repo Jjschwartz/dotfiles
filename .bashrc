@@ -139,3 +139,7 @@ function uvrunx() {
     uvx "$@"
 }
 # ---- END UV ----
+
+export PATH=$PATH:"/home/jonathon/.temporalio/bin"
+export PATH=/usr/local/go/bin:$HOME/go/bin:$PATH
+

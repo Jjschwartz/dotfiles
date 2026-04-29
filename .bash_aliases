@@ -27,3 +27,6 @@ alias dotf='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree $HOME'
 alias vi='nvim'  # Use 'nvim' (Neovim) when typing 'vi'
 alias vim='nvim'  # Use 'nvim' when typing 'vim'
 # ---- END NVIM ----
+
+alias gcslogin='gcloud auth login --update-adc'
+alias pythonolympus='./dist/export/python/virtualenvs/base/3.12.12/bin/python3.12'
